@@ -20,14 +20,15 @@
 
 (define (geiser:eval module form . rest)
   rest
-  (let ((output (open-output-string))
-        (result (if module
-                    (let ((mod (module-env (find-module module))))
-                      (eval form mod))
-                    (eval form))))
-    (write `((result ,(write-to-string result))
-             (output . ,(get-output-string output))))
-    (values)))
+  (guard (err (else (write `((result ,(show #f err))))))
+    (let ((output (open-output-string))
+          (result (if module
+                      (let ((mod (module-env (find-module module))))
+                        (eval form mod))
+                      (eval form))))
+      (write `((result ,(write-to-string result))
+               (output . ,(get-output-string output))))))
+  (values))
 
 (define (geiser:module-completions prefix . rest)
   ;; (available-modules) walks the directory tree and is too slow
