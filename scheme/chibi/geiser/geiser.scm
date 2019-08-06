@@ -93,8 +93,6 @@
 
 (define (geiser:newline)
   #f)
-;(define (geiser:symbol-location)
-					;  '("geiser-chibi-error" "Not implemented"))
 
 ;;> A chibi implementation of the standard geiser's location-making
 ;;> subrouting. \var{file} is a string representing file name with path,
@@ -104,6 +102,11 @@
   (list (cons "file" (if (string? file) file '()))
         (cons "line" (if (number? line) (+ 1 line) '()))))
 
+
+;TODO: (define (geiser:symbol-location) ; implement this method in order to make
+; xref work better in Chibi. For reference, see [[geiser:module-location]]
+
+
 ;;> A function to find the file where the symbol
 ;;> \var{symbol-representing-module} is defined.
 
@@ -112,10 +115,5 @@
    (find-module-file
     (module-name->file
      (module-name
-      (find-module symbol-representing-module)
-     )
-    )
-   )
-  0
- )
-)
+      (find-module symbol-representing-module))))
+   0 ) )
