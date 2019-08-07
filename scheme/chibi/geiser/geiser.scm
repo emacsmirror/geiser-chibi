@@ -19,14 +19,22 @@
     (write form out)
     (get-output-string out)))
 
+;;> Evaluate a \var{form} in the namespace of the \var{module}.
+;;> The meaning of \var{rest} is unknown.
+;;> Return the alist with the first field, \scheme{result}, holds
+;;> the result of evaluation \scheme{(write)}'d and the second
+;;> field, \scheme{output}, contains everyting that the evaluation
+;;> would print to the standard output.
+
 (define (geiser:eval module form . rest)
   rest
   (guard (err (else (write `((result ,(show #f err))))))
-    (let ((output (open-output-string))
-          (result (if module
+    (let* ((output (open-output-string))
+          (result (parameterize ((current-output-port output))
+		    (if module
                       (let ((mod (module-env (find-module module))))
                         (eval form mod))
-                      (eval form))))
+                      (eval form)))))
       (write `((result ,(write-to-string result))
                (output . ,(get-output-string output))))))
   (values))
@@ -95,7 +103,7 @@
   #f)
 
 ;;> A chibi implementation of the standard geiser's location-making
-;;> subrouting. \var{file} is a string representing file name with path,
+;;> subroutine. \var{file} is a string representing file name with path,
 ;;> \var{line} is the line number starting from 0 (scheme way).
 
 (define (make-location file line)
