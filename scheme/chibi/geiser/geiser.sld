@@ -8,5 +8,15 @@
 ;TODO:	  geiser:symbol-location ; implement this interface in [[file://./geiser.scm#geiser:symbol-location]] in order to make proper cross-referencing working.
 	  geiser:module-location
           geiser:newline)
-  (import (scheme small) (chibi modules) (chibi) (meta) (chibi ast) (chibi string) (srfi 1) (srfi 95) (chibi show))
+  (import
+    (scheme small)
+    (chibi modules)
+    (chibi)
+    (chibi filesystem)
+    (meta)
+    (chibi ast)
+    (chibi string)
+    (srfi 1)
+    (srfi 95)
+    (chibi show))
   (include "geiser.scm"))
