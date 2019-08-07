@@ -120,8 +120,9 @@
 
 (define (geiser:module-location symbol-representing-module)
   (make-location
-   (find-module-file
+   (string-append (current-directory) "/"
+    (find-module-file
     (module-name->file
      (module-name
-      (find-module symbol-representing-module))))
+      (find-module symbol-representing-module)))))
    0 ) )
