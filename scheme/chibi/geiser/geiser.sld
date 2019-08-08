@@ -5,7 +5,7 @@
           geiser:autodoc
           geiser:module-completions
           geiser:no-values
-;TODO:	  geiser:symbol-location ; implement this interface in [[file://./geiser.scm#geiser:symbol-location]] in order to make proper cross-referencing working.
+	  geiser:symbol-location ; implement this interface in [[file://./geiser.scm#geiser:symbol-location]] in order to make proper cross-referencing working.
 	  geiser:module-location
           geiser:newline)
   (import
@@ -13,10 +13,13 @@
     (chibi modules)
     (chibi)
     (chibi filesystem)
+    (chibi pathname)
     (meta)
     (chibi ast)
     (chibi string)
     (srfi 1)
     (srfi 95)
-    (chibi show))
+    (srfi 38)
+    (chibi show)
+    (srfi 115))
   (include "geiser.scm"))
