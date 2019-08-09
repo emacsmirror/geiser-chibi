@@ -126,29 +126,45 @@
         (cons "line" (if (number? line) (+ 1 line) '())))
 )
 
+;;> Finds symbol locations in source files. This version
+;;> is very early preview and still has the following limitations:
+;;> * It only works with exported symbols. (Even for current file).
+;;> * Even with exported symbols it ignores the renamed ones.
+;;> * It only accesses identifiers which have code positions
+;;>   associated with them in runtime. I.e. it doesn't grep.
 
-;TODO: (define (geiser:symbol-location)
-; implement this method in order to make
-; xref work better in Chibi. For reference, see [[geiser:module-location]]
-; (analyze-module (caar (modules-exporting-identifier 'symbol-in-question)))
-;(module-ast (analyze-module (caar (modules-exporting-identifier 'ckind))))
 (define (geiser:symbol-location symbol-in-question . rest)
-  (let* (
-	 (result (tree-walker
-		 (module-ast
-		  (analyze-module
-		   (caar
-		    (modules-exporting-identifier
-		     symbol-in-question))))
-		 symbol-in-question))
-	 (location
-	  (make-location
-	   (car result)
-	   (- (cdr result) 1))) ; Ehh... line numbering in 'make-location starts from 0
-	 )
-    location
-    )
-)
+  (display "Modules exporting identifier ")
+  (display symbol-in-question)
+  (display "found:")
+  (newline)
+  (guard (err
+	  ((error-object? err)
+	   (display "Error in geiser:symbol-location:")
+	   (display (error-object-message err))
+	   (make-location '() '()))
+	  (else
+	   (display "Peculiar error in geiser:symbol-location:")
+	   (display err)
+	   (make-location '() '())))
+    (let* ((l-modules-found (modules-exporting-identifier symbol-in-question))
+	   (result (if (not (equal? l-modules-found '()))
+		       (let* ((l-selected-module (caar l-modules-found))
+			      (result (tree-walker
+				       (module-ast
+					(analyze-module
+					 l-selected-module))
+			     symbol-in-question)))
+			 (display (map car l-modules-found))
+			 (newline)
+			 result)
+		       (let ((result (cons '() '())))
+			 (display "Not found.\n")
+		result))))
+      (make-location
+       (car result)
+       (- (cdr result) 1) ; Ehh... line numbering in 'make-location starts from 0
+       ))))
 
 (define (tree-walker node . symbol-in-question)
 ; The reason this function used  a (let), not a (begin) is that (begin)
@@ -170,14 +186,12 @@
       (let () ; we have leaf
 	(if (set? node)
 	    (if (equal? (ref-name (set-var node)) (car symbol-in-question))
-		(let ((thingy (set-value node)))
-		  (if (lambda? thingy)
-		      (lambda->lcons thingy)
-		      (set-node->lcons/dirty-trick node)
-		      )
-		  )
-		#f
-		)
+		(let
+		    ((thingy (set-value node)))
+		  (cond ((lambda? thingy) (lambda->lcons thingy))
+			;((macro?  thingy) (error "Macros not supported"))
+			(else (set-node->lcons/dirty-trick node))))
+		#f)
 	    #f
 	    )
 	)
@@ -185,17 +199,30 @@
   )
 
 (define (lambda->lcons thingy)
-  (let* ((l-source (lambda-source thingy))
-	 (l-location
-	  (cons
-	   (car l-source)
-	   (cdr l-source))))
-    l-location
-    ))
+      (let* ((l-source (lambda-source thingy))
+	     (l-location
+	      (if (pair? l-source)
+		  (cons
+		   (car l-source)
+		   (cdr l-source))
+		  (let ()
+		    (display "Lambda with no source information.")
+		    (cons '() '())))))
+	l-location))
+
+
+
+;;> We resort to this dirty trick of write/ss parsing because we don't
+;;> have the set-source accessor as a public method. If set-source
+;;> still appears in Chibi > 0.8, it may still be useful for more
+;;> obscure data types.
 
 (define (set-node->lcons/dirty-trick node)
-  (let* ((exam2 (geiser:write/ss-to-string node))
-	 (strl (string-length exam2))
+  (guard (err
+	  (else
+	   (error "set-source dirty trick failed!" )))
+  (let* ((l-str-to-check (geiser:write/ss-to-string node))
+	 (strl (string-length l-str-to-check))
 	 (l-matches
 	  (regexp-search
 	   '(: "(\""
@@ -203,7 +230,7 @@
 	       "\" . "
 	       (-> lineno (+ num) )
 	       ")}")
-	   exam2 ))
+	   l-str-to-check ))
 	 (l-filename
 	  (regexp-match-submatch l-matches 'filename))
 	 (l-lineno
@@ -211,7 +238,7 @@
 	   (regexp-match-submatch l-matches 'lineno)))
 	 (l-location
 	  (cons l-filename l-lineno)))
-    l-location))
+    l-location)))
 
 ;(geiser:symbol-location 'run-application)
 
@@ -221,12 +248,22 @@
 ;;> \var{symbol-representing-module} is defined.
 
 (define (geiser:module-location symbol-representing-module)
-  (make-location
-   (find-module-file
-    (module-name->file
-     (module-name
-      (find-module symbol-representing-module))))
-   0 )
-)
-
-
+  (guard ( err
+	   ((error-object? err)
+	    (display "Error in module-location:\n")
+	    (display err)
+	    (newline)
+	    (display (error-object-message err))
+	    (make-location '() '()))
+	   (else
+	    (display "Peculiar error!\n")
+	    (display err)
+	    (newline)
+	    (make-location '() '())))
+    (let ((l-module (find-module symbol-representing-module)))
+      (if (not (equal? l-module '()) )
+	  (make-location
+	   (find-module-file
+	    (module-name->file
+	     (module-name l-module))) 0 )
+	  (make-location '() '())))))
