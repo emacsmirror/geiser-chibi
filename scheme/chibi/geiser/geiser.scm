@@ -47,8 +47,6 @@
   (values))
 
 
-; (display "debug:Hello\n")
-
 (define (geiser:module-completions prefix . rest)
   ;; (available-modules) walks the directory tree and is too slow
   (let ((modules (map car *modules*)))
@@ -112,6 +110,8 @@
 (define (geiser:newline)
   #f)
 
+
+
 ;;> A chibi implementation of the standard geiser's location-making
 ;;> subroutine. \var{file} is a string representing file name with path,
 ;;> \var{line} is the line number starting from 0 (scheme way).
@@ -125,6 +125,8 @@
 		  '()))
         (cons "line" (if (number? line) (+ 1 line) '())))
 )
+
+
 
 ;;> Finds symbol locations in source files. This version
 ;;> is very early preview and still has the following limitations:
@@ -193,22 +195,19 @@
 			(else (set-node->lcons/dirty-trick node))))
 		#f)
 	    #f
-	    )
-	)
-      )
-  )
+	    ))))
 
 (define (lambda->lcons thingy)
-      (let* ((l-source (lambda-source thingy))
-	     (l-location
-	      (if (pair? l-source)
-		  (cons
-		   (car l-source)
-		   (cdr l-source))
-		  (let ()
-		    (display "Lambda with no source information.")
-		    (cons '() '())))))
-	l-location))
+  (let* ((l-source (lambda-source thingy))
+	 (l-location
+	  (if (pair? l-source)
+	      (cons
+	       (car l-source)
+	       (cdr l-source))
+	      (let ()
+		(display "Lambda with no source information.")
+		(cons '() '())))))
+    l-location))
 
 
 
@@ -240,9 +239,7 @@
 	  (cons l-filename l-lineno)))
     l-location)))
 
-;(geiser:symbol-location 'run-application)
-
-
+
 
 ;;> A function to find the file where the symbol
 ;;> \var{symbol-representing-module} is defined.
