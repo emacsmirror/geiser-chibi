@@ -73,8 +73,7 @@ This function uses `geiser-chibi-init-file' if it exists."
        (format "(geiser:%s %s)" proc form)))))
 
 (defun geiser-chibi--get-module (&optional module)
-  (cond ((null module)
-         :f)
+  (cond ((null module)  :f)
         ((listp module) module)
         ((stringp module)
          (condition-case nil
@@ -92,7 +91,9 @@ This function uses `geiser-chibi-init-file' if it exists."
   (format "(import %s)" module))
 
 (defun geiser-chibi--exit-command () "(exit 0)")
+
 ;; 
+
 ;; ;;; REPL startup
 
 (defconst geiser-chibi-minimum-version "0.7.3")

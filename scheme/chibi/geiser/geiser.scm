@@ -30,27 +30,29 @@
 ;;> the result of evaluation \scheme{(write)}'d and the second
 ;;> field, \scheme{output}, contains everyting that the evaluation
 ;;> would print to the standard output.
+;;> In case of an exception, the message is formatted with
+;;> \scheme{(chibi show)} and written to both variables in addition
+;;> to whatever was already there.
 
 (define (geiser:eval module form . rest)
   rest
   (guard (err
 	  (else
-	   ;; TODO:We need to save output when returning errors too. The
-	   ;; output may very well be produced before an error occurs. But to
-	   ;; implement it wisely, we probably need something like two guard
-	   ;; expressions. For example, org-mode's ob-scheme.el needs it.:END
-
-	   (write `((result ,(show #f err))))))
+	   (write ; to standard output
+	    "Geiser-chibi falure in scheme code.")
+	   (show #t err)))
     (let* ((output (open-output-string))
 	   (result (parameterize ((current-output-port output))
-		     (if module
-			 (let ((mod (module-env (find-module module))))
-			   (eval form mod))
-			 (eval form))
-		     )
-		   ))
-      (write `((result ,(write-to-string result))
-               (output . ,(get-output-string output))))))
+		     (guard (err
+			     (else (show #t err)
+				   (write-to-string (show #f err))))
+		       (if module
+			   (let ((mod (module-env (find-module module))))
+			     (eval form mod))
+			 (eval form))))))
+      (write ; to standard output (to comint)
+       `((result ,(write-to-string result))
+		  (output . ,(get-output-string output))))))
   (values))
 
 
