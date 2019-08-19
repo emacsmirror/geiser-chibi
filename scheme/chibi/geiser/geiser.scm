@@ -33,7 +33,14 @@
 
 (define (geiser:eval module form . rest)
   rest
-  (guard (err (else (write `((result ,(show #f err))))))
+  (guard (err
+	  (else
+	   ;; TODO:We need to save output when returning errors too. The
+	   ;; output may very well be produced before an error occurs. But to
+	   ;; implement it wisely, we probably need something like two guard
+	   ;; expressions. For example, org-mode's ob-scheme.el needs it.:END
+
+	   (write `((result ,(show #f err))))))
     (let* ((output (open-output-string))
 	   (result (parameterize ((current-output-port output))
 		     (if module
