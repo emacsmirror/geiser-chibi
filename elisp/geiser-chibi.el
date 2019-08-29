@@ -32,6 +32,13 @@
   :type '(choice string (repeat string))
   :group 'geiser-chibi)
 
+(geiser-custom--defcustom geiser-chibi-extra-command-line-parameters
+    '("-R" "-m" "chibi ast")
+  "Additional parameters to supply to the Chibi binary."
+  :type '(repeat string)
+  :group 'geiser-chibi)
+
+
 
 ;;; REPL support:
 
@@ -43,7 +50,8 @@
 (defun geiser-chibi--parameters ()
   "Return a list with all parameters needed to start Chibi Scheme.
 This function uses `geiser-chibi-init-file' if it exists."
-  `("-I" ,(expand-file-name "chibi/geiser/" geiser-scheme-dir)
+  `(,@geiser-chibi-extra-command-line-parameters
+    "-I" ,(expand-file-name "chibi/geiser/" geiser-scheme-dir)
     "-m" "geiser"
     ,@(and (listp geiser-chibi-binary) (cdr geiser-chibi-binary)))
   )
