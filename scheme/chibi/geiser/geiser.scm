@@ -38,18 +38,19 @@
   rest
   (guard (err
 	  (else
-	   (write ; to standard output
+	   (write ; to standard output (to comint)
 	    "Geiser-chibi falure in scheme code.")
 	   (show #t err)))
     (let* ((output (open-output-string))
+	   (form-analyzed (analyze form))
 	   (result (parameterize ((current-output-port output))
 		     (guard (err
 			     (else (show #t err)
 				   (write-to-string (show #f err))))
 		       (if module
 			   (let ((mod (module-env (find-module module))))
-			     (eval form mod))
-			 (eval form))))))
+			     (eval form-analyzed mod))
+			 (eval form-analyzed))))))
       (write ; to standard output (to comint)
        `((result ,(write-to-string result))
 		  (output . ,(get-output-string output))))))
@@ -102,6 +103,7 @@
            '()))))
 
 (define (geiser:autodoc ids . rest)
+  (and #f ( ;; disabled temporarily, because it didn't really work
   rest
   (cond ((null? ids) '())
         ((not (list? ids))
@@ -111,7 +113,7 @@
         (else
          (map (lambda (id)
                 (geiser:operator-arglist id))
-              ids))))
+              ids))))))
 
 (define (geiser:no-values)
   #f)
