@@ -1,4 +1,4 @@
-; -*- geiser-scheme-implementation:chibi; -*-
+;;; -*- geiser-scheme-implementation:chibi; -*-
 (define (all-environment-exports environment prefix)
   (if environment
       (append (filter (lambda (identifier)
@@ -43,36 +43,36 @@
 (define (geiser:eval module form . rest)
   rest
   (guard (err
-	  (else
-	   (show #t ; to standard output (to comint)
-	    "Geiser-chibi falure in scheme code\n")
-	   (show #t "Error: \n" err "\n")
-	   (print-stack-trace)))
+          (else
+           (show #t ; to standard output (to comint)
+                 "Geiser-chibi falure in scheme code\n")
+           (show #t "Error: \n" err "\n")
+           (print-stack-trace)))
     (let* ((output (open-output-string))
-	   (form-analyzed (analyze form))
-	   (result (parameterize ((current-output-port output))
-		     (call/cc (lambda (continuation)
-				(with-exception-handler
-				    (lambda (err)
-				      (let ((stack-trace (get-stack-trace)))
-					(show #t
-					      "Output (exception): "
-					      err
-					      " \nStack trace:\n"
-					      stack-trace)
-					(continuation (write-to-string
-						       (show #f
-							     "Result (exception): "
-							     err
-							     "\nStack trace:\n"
-							     stack-trace)))))
-				  (lambda () (if module
-				      (let ((mod (module-env (find-module module))))
-					(eval form-analyzed mod))
-				      (eval form-analyzed)))))))))
+           (form-analyzed (analyze form))
+           (result (parameterize ((current-output-port output))
+                     (call/cc (lambda (continuation)
+                                (with-exception-handler
+                                    (lambda (err)
+                                      (let ((stack-trace (get-stack-trace)))
+                                        (show #t
+                                              "Output (exception): "
+                                              err
+                                              " \nStack trace:\n"
+                                              stack-trace)
+                                        (continuation (write-to-string
+                                                       (show #f
+                                                             "Result (exception): "
+                                                             err
+                                                             "\nStack trace:\n"
+                                                             stack-trace)))))
+                                  (lambda () (if module
+					    (let ((mod (module-env (find-module module))))
+                                              (eval form-analyzed mod))
+					    (eval form-analyzed)))))))))
       (write ; to standard output (to comint)
        `((result ,(write-to-string result))
-	 (output . ,(get-output-string output))))))
+         (output . ,(get-output-string output))))))
   (values))
 
 
@@ -123,16 +123,16 @@
 
 (define (geiser:autodoc ids . rest)
   (and #f ( ;; disabled temporarily, because it didn't really work
-  rest
-  (cond ((null? ids) '())
-        ((not (list? ids))
-         (geiser:autodoc (list ids)))
-        ((not (symbol? (car ids)))
-         (geiser:autodoc (cdr ids)))
-        (else
-         (map (lambda (id)
-                (geiser:operator-arglist id))
-              ids))))))
+	   rest
+	   (cond ((null? ids) '())
+		 ((not (list? ids))
+		  (geiser:autodoc (list ids)))
+		 ((not (symbol? (car ids)))
+		  (geiser:autodoc (cdr ids)))
+		 (else
+		  (map (lambda (id)
+			 (geiser:operator-arglist id))
+		       ids))))))
 
 (define (geiser:no-values)
   #f)
@@ -148,13 +148,13 @@
 
 (define (make-location file line)
   (list (cons "file"
-	      (if (string? file)
-		  (path-resolve
-		   file
-		   (current-directory))
-		  '()))
+              (if (string? file)
+                  (path-resolve
+                   file
+                   (current-directory))
+                  '()))
         (cons "line" (if (number? line) (+ 1 line) '())))
-)
+  )
 
 
 
@@ -171,72 +171,72 @@
   (display "found:")
   (newline)
   (guard (err
-	  ((error-object? err)
-	   (display "Error in geiser:symbol-location:")
-	   (display (error-object-message err))
-	   (make-location '() '()))
-	  (else
-	   (display "Peculiar error in geiser:symbol-location:")
-	   (display err)
-	   (make-location '() '())))
+          ((error-object? err)
+           (display "Error in geiser:symbol-location:")
+           (display (error-object-message err))
+           (make-location '() '()))
+          (else
+           (display "Peculiar error in geiser:symbol-location:")
+           (display err)
+           (make-location '() '())))
     (let* ((l-modules-found (modules-exporting-identifier symbol-in-question))
-	   (result (if (not (equal? l-modules-found '()))
-		       (let* ((l-selected-module (caar l-modules-found))
-			      (result (tree-walker
-				       (module-ast
-					(analyze-module
-					 l-selected-module))
-			     symbol-in-question)))
-			 (display (map car l-modules-found))
-			 (newline)
-			 result)
-		       (let ((result (cons '() '())))
-			 (display "Not found.\n")
-		result))))
+           (result (if (not (equal? l-modules-found '()))
+                       (let* ((l-selected-module (caar l-modules-found))
+                              (result (tree-walker
+                                       (module-ast
+                                        (analyze-module
+                                         l-selected-module))
+				       symbol-in-question)))
+                         (display (map car l-modules-found))
+                         (newline)
+                         result)
+                       (let ((result (cons '() '())))
+                         (display "Not found.\n")
+			 result))))
       (make-location
        (car result)
        (- (cdr result) 1) ; Ehh... line numbering in 'make-location starts from 0
        ))))
 
 (define (tree-walker node . symbol-in-question)
-; The reason this function used  a (let), not a (begin) is that (begin)
-; for some reason does not allow (display)s inside. It 
-; works in xfce4-terminal, but not here. I decided not to
-; debug it, since (let () ) "just worked". TODO.
+					; The reason this function used  a (let), not a (begin) is that (begin)
+					; for some reason does not allow (display)s inside. It 
+					; works in xfce4-terminal, but not here. I decided not to
+					; debug it, since (let () ) "just worked". TODO.
   
   (if (pair? node)
-	(let ((result
-	       (tree-walker
-		(car node)
-		(car symbol-in-question)))
-	      )
-	  (if result
-		result
-		(tree-walker (cdr node) (car symbol-in-question))
-	      )
-	  )
+      (let ((result
+             (tree-walker
+              (car node)
+              (car symbol-in-question)))
+            )
+        (if result
+            result
+            (tree-walker (cdr node) (car symbol-in-question))
+            )
+        )
       (let () ; we have leaf
-	(if (set? node)
-	    (if (equal? (ref-name (set-var node)) (car symbol-in-question))
-		(let
-		    ((thingy (set-value node)))
-		  (cond ((lambda? thingy) (lambda->lcons thingy))
-			;((macro?  thingy) (error "Macros not supported"))
-			(else (set-node->lcons/dirty-trick node))))
-		#f)
-	    #f
-	    ))))
+        (if (set? node)
+            (if (equal? (ref-name (set-var node)) (car symbol-in-question))
+                (let
+                    ((thingy (set-value node)))
+                  (cond ((lambda? thingy) (lambda->lcons thingy))
+					;((macro?  thingy) (error "Macros not supported"))
+                        (else (set-node->lcons/dirty-trick node))))
+                #f)
+            #f
+            ))))
 
 (define (lambda->lcons thingy)
   (let* ((l-source (lambda-source thingy))
-	 (l-location
-	  (if (pair? l-source)
-	      (cons
-	       (car l-source)
-	       (cdr l-source))
-	      (let ()
-		(display "Lambda with no source information.")
-		(cons '() '())))))
+         (l-location
+          (if (pair? l-source)
+              (cons
+               (car l-source)
+               (cdr l-source))
+              (let ()
+                (display "Lambda with no source information.")
+                (cons '() '())))))
     l-location))
 
 
@@ -248,26 +248,26 @@
 
 (define (set-node->lcons/dirty-trick node)
   (guard (err
-	  (else
-	   (error "set-source dirty trick failed!" )))
-  (let* ((l-str-to-check (geiser:write/ss-to-string node))
-	 (strl (string-length l-str-to-check))
-	 (l-matches
-	  (regexp-search
-	   '(: "(\""
-	       (-> filename (*? graphic) )
-	       "\" . "
-	       (-> lineno (+ num) )
-	       ")}")
-	   l-str-to-check ))
-	 (l-filename
-	  (regexp-match-submatch l-matches 'filename))
-	 (l-lineno
-	  (string->number
-	   (regexp-match-submatch l-matches 'lineno)))
-	 (l-location
-	  (cons l-filename l-lineno)))
-    l-location)))
+          (else
+           (error "set-source dirty trick failed!" )))
+    (let* ((l-str-to-check (geiser:write/ss-to-string node))
+           (strl (string-length l-str-to-check))
+           (l-matches
+            (regexp-search
+             '(: "(\""
+		 (-> filename (*? graphic) )
+		 "\" . "
+		 (-> lineno (+ num) )
+		 ")}")
+             l-str-to-check ))
+           (l-filename
+            (regexp-match-submatch l-matches 'filename))
+           (l-lineno
+            (string->number
+             (regexp-match-submatch l-matches 'lineno)))
+           (l-location
+            (cons l-filename l-lineno)))
+      l-location)))
 
 
 
@@ -276,21 +276,21 @@
 
 (define (geiser:module-location symbol-representing-module)
   (guard ( err
-	   ((error-object? err)
-	    (display "Error in module-location:\n")
-	    (display err)
-	    (newline)
-	    (display (error-object-message err))
-	    (make-location '() '()))
-	   (else
-	    (display "Peculiar error!\n")
-	    (display err)
-	    (newline)
-	    (make-location '() '())))
+           ((error-object? err)
+            (display "Error in module-location:\n")
+            (display err)
+            (newline)
+            (display (error-object-message err))
+            (make-location '() '()))
+           (else
+            (display "Peculiar error!\n")
+            (display err)
+            (newline)
+            (make-location '() '())))
     (let ((l-module (find-module symbol-representing-module)))
       (if (not (equal? l-module '()) )
-	  (make-location
-	   (find-module-file
-	    (module-name->file
-	     (module-name l-module))) 0 )
-	  (make-location '() '())))))
+          (make-location
+           (find-module-file
+            (module-name->file
+             (module-name l-module))) 0 )
+          (make-location '() '())))))
