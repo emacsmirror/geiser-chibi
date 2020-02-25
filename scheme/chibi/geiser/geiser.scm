@@ -200,10 +200,10 @@
 
 (define (tree-walker node . symbol-in-question)
 					; The reason this function used  a (let), not a (begin) is that (begin)
-					; for some reason does not allow (display)s inside. It 
+					; for some reason does not allow (display)s inside. It
 					; works in xfce4-terminal, but not here. I decided not to
 					; debug it, since (let () ) "just worked". TODO.
-  
+
   (if (pair? node)
       (let ((result
              (tree-walker

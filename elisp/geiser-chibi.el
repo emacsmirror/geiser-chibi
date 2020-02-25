@@ -147,4 +147,3 @@ This function uses `geiser-chibi-init-file' if it exists."
 (geiser-impl--add-to-alist 'regexp "\\.sld$" 'chibi t)
 
 (provide 'geiser-chibi)
-
