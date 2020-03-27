@@ -20,7 +20,7 @@
 (require 'compile)
 (require 'info-look)
 
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
 
 
 ;;; Customization:
@@ -65,7 +65,7 @@ This function uses `geiser-chibi-init-file' if it exists."
 ;;; Evaluation support:
 
 (defun geiser-chibi--geiser-procedure (proc &rest args)
-  (case proc
+  (cl-case proc
     ((eval compile)
      (let ((form (mapconcat 'identity (cdr args) " "))
            (module (cond ((string-equal "'()" (car args))
@@ -110,9 +110,9 @@ This function uses `geiser-chibi-init-file' if it exists."
 (defconst geiser-chibi-minimum-version "0.7.3")
 
 (defun geiser-chibi--version (binary)
-  (second (split-string
-           (car (process-lines binary "-V"))
-           " ")))
+  (cadr (split-string
+         (car (process-lines binary "-V"))
+         " ")))
 
 (defun geiser-chibi--startup (remote)
   (let ((geiser-log-verbose-p t))
