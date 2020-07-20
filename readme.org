@@ -1,4 +1,4 @@
-* Guile and Geiser talk to each other
+* Chibi and Geiser talk to each other
 
 This package provides support for using [[https://github.com/ashinn/chibi-scheme/][Chibi Scheme]] in Emacs with
 [[http://geiser.nongnu.org][Geiser]].
