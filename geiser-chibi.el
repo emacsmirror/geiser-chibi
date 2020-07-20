@@ -1,9 +1,12 @@
 ;;; geiser-chibi.el -- Chibi Scheme's implementation of the geiser protocols
 
-;; This program is free software; you can redistribute it and/or
-;; modify it under the terms of the Modified BSD License. You should
-;; have received a copy of the license along with this program. If
-;; not, see <http://www.xfree86.org/3.3.6/COPYRIGHT2.html#5>.
+;; Author: Peter <craven@gmx.net>
+;; Maintainer:
+;; Keywords: languages, chibi, scheme, geiser
+;; Homepage: https://gitlab.com/emacs-geiser/chez
+;; Package-Requires: ((emacs "24.4") (geiser-core "1.0"))
+;; SPDX-License-Identifier: BSD-3-Clause
+;; Version: 1.0
 
 
 ;;; Code:
@@ -50,11 +53,15 @@
       (car geiser-chibi-binary)
     geiser-chibi-binary))
 
+(defvar geiser-chibi-scheme-dir
+  (expand-file-name "src" (file-name-directory load-file-name))
+  "Directory where the Chibi scheme geiser modules are installed.")
+
 (defun geiser-chibi--parameters ()
   "Return a list with all parameters needed to start Chibi Scheme.
 This function uses `geiser-chibi-init-file' if it exists."
   `(,@geiser-chibi-extra-command-line-parameters
-    "-I" ,(expand-file-name "chibi/geiser/" geiser-scheme-dir)
+    "-I" ,(expand-file-name "geiser/" geiser-chibi-scheme-dir)
     "-m" "geiser"
     ,@(and (listp geiser-chibi-binary) (cdr geiser-chibi-binary)))
   )
