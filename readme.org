@@ -1,0 +1,8 @@
+* Guile and Geiser talk to each other
+
+This package provides support for using [[https://github.com/ashinn/chibi-scheme/][Chibi Scheme]] in Emacs with
+[[http://geiser.nongnu.org][Geiser]].
+
+Provided [[https://gitlab.com/emacs-geiser/core][geiser-core]] is installed in your system, if this package's
+directory is in your load path, just add ~(require 'geiser-chibi)~ to
+your initialisation files and then ~M-x run-chibi~ to start a REPL.
