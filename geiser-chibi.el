@@ -6,7 +6,7 @@
 ;; Homepage: https://gitlab.com/emacs-geiser/chibi
 ;; Package-Requires: ((emacs "24.4") (geiser "0.12"))
 ;; SPDX-License-Identifier: BSD-3-Clause
-;; Version: 1.0
+;; Version: 0.13
 
 ;;; Commentary:
 
