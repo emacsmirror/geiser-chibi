@@ -1,12 +1,16 @@
-;;; geiser-chibi.el -- Chibi Scheme's implementation of the geiser protocols
+;;; geiser-chibi.el --- Chibi Scheme's implementation of the geiser protocols  -*- lexical-binding: t; -*-
 
 ;; Author: Peter <craven@gmx.net>
-;; Maintainer:
+;; Maintainer: Jose A Ortega Ruiz <jao@gnu.org>
 ;; Keywords: languages, chibi, scheme, geiser
 ;; Homepage: https://gitlab.com/emacs-geiser/chez
-;; Package-Requires: ((emacs "24.4") (geiser-core "1.0"))
+;; Package-Requires: ((emacs "24.4") (geiser "0.12"))
 ;; SPDX-License-Identifier: BSD-3-Clause
 ;; Version: 1.0
+
+;;; Commentary:
+
+;; This package provides support for Chibi in geiser.
 
 
 ;;; Code:
@@ -49,6 +53,7 @@
 ;;; REPL support:
 
 (defun geiser-chibi--binary ()
+  "Return path to Chibi scheme executable."
   (if (listp geiser-chibi-binary)
       (car geiser-chibi-binary)
     geiser-chibi-binary))
@@ -63,8 +68,7 @@ This function uses `geiser-chibi-init-file' if it exists."
   `(,@geiser-chibi-extra-command-line-parameters
     "-I" ,(expand-file-name "geiser/" geiser-chibi-scheme-dir)
     "-m" "geiser"
-    ,@(and (listp geiser-chibi-binary) (cdr geiser-chibi-binary)))
-  )
+    ,@(and (listp geiser-chibi-binary) (cdr geiser-chibi-binary))))
 
 (defconst geiser-chibi--prompt-regexp "> ")
 
@@ -72,6 +76,7 @@ This function uses `geiser-chibi-init-file' if it exists."
 ;;; Evaluation support:
 
 (defun geiser-chibi--geiser-procedure (proc &rest args)
+  "Transform PROC in string for a scheme procedure using ARGS."
   (cl-case proc
     ((eval compile)
      (let ((form (mapconcat 'identity (cdr args) " "))
@@ -91,6 +96,7 @@ This function uses `geiser-chibi-init-file' if it exists."
        (format "(geiser:%s %s)" proc form)))))
 
 (defun geiser-chibi--get-module (&optional module)
+  "Find current buffer's module, using MODULE as a hint."
   (cond ((null module)  :f)
         ((listp module) module)
         ((stringp module)
@@ -100,15 +106,19 @@ This function uses `geiser-chibi-init-file' if it exists."
         (t :f)))
 
 (defun geiser-chibi--symbol-begin (module)
+  "Return beginning of current symbol while in MODULE."
   (if module
       (max (save-excursion (beginning-of-line) (point))
            (save-excursion (skip-syntax-backward "^(>") (1- (point))))
     (save-excursion (skip-syntax-backward "^'-()>") (point))))
 
 (defun geiser-chibi--import-command (module)
+  "Return string representing an sexp importing MODULE."
   (format "(import %s)" module))
 
-(defun geiser-chibi--exit-command () "(exit 0)")
+(defun geiser-chibi--exit-command ()
+  "Return string representing a REPL exit sexp."
+  "(exit 0)")
 
 ;; 
 
@@ -117,14 +127,15 @@ This function uses `geiser-chibi-init-file' if it exists."
 (defconst geiser-chibi-minimum-version "0.7.3")
 
 (defun geiser-chibi--version (binary)
+  "Use BINARY to find Chez scheme version."
   (cadr (split-string
          (car (process-lines binary "-V"))
          " ")))
 
-(defun geiser-chibi--startup (remote)
+(defun geiser-chibi--startup (_remote)
+  "Startup function."
   (let ((geiser-log-verbose-p t))
-    (compilation-setup t)
-    ))
+    (compilation-setup t)))
 
 ;;; Implementation definition:
 
@@ -152,5 +163,14 @@ This function uses `geiser-chibi-init-file' if it exists."
 
 (geiser-impl--add-to-alist 'regexp "\\.scm$" 'chibi t)
 (geiser-impl--add-to-alist 'regexp "\\.sld$" 'chibi t)
+
+;;;###autoload
+(autoload 'run-chibi "geiser-chibi" "Start a Geiser Chibi Scheme REPL." t)
+
+;;;###autoload
+(autoload 'switch-to-chibi "geiser-chibi"
+  "Start a Geiser Chibi Scheme REPL, or switch to a running one." t)
+
 
 (provide 'geiser-chibi)
+;;; geiser-chibi.el ends here
