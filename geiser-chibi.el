@@ -3,7 +3,7 @@
 ;; Author: Peter <craven@gmx.net>
 ;; Maintainer: Jose A Ortega Ruiz <jao@gnu.org>
 ;; Keywords: languages, chibi, scheme, geiser
-;; Homepage: https://gitlab.com/emacs-geiser/chez
+;; Homepage: https://gitlab.com/emacs-geiser/chibi
 ;; Package-Requires: ((emacs "24.4") (geiser "0.12"))
 ;; SPDX-License-Identifier: BSD-3-Clause
 ;; Version: 1.0
