@@ -17,6 +17,7 @@
 
 (require 'geiser-connection)
 (require 'geiser-syntax)
+(require 'geiser-impl)
 (require 'geiser-custom)
 (require 'geiser-base)
 (require 'geiser-eval)
@@ -162,7 +163,12 @@ This function uses `geiser-chibi-init-file' if it exists."
   )
 
 (geiser-impl--add-to-alist 'regexp "\\.scm$" 'chibi t)
+
+;;;###autoload
 (geiser-impl--add-to-alist 'regexp "\\.sld$" 'chibi t)
+
+;;;###autoload
+(geiser-activate-implementation 'chibi)
 
 ;;;###autoload
 (autoload 'run-chibi "geiser-chibi" "Start a Geiser Chibi Scheme REPL." t)
