@@ -4,9 +4,9 @@
 ;; Maintainer: Jose A Ortega Ruiz <jao@gnu.org>
 ;; Keywords: languages, chibi, scheme, geiser
 ;; Homepage: https://gitlab.com/emacs-geiser/chibi
-;; Package-Requires: ((emacs "24.4") (geiser "0.16"))
+;; Package-Requires: ((emacs "24.4") (geiser "0.18"))
 ;; SPDX-License-Identifier: BSD-3-Clause
-;; Version: 0.16
+;; Version: 0.17
 
 ;;; Commentary:
 
@@ -161,8 +161,6 @@ This function uses `geiser-chibi-init-file' if it exists."
   ;; (keywords geiser-chibi--keywords)
   ;; (case-sensitive geiser-chibi-case-sensitive-p)
   )
-
-(geiser-implementation-extension 'chibi "scm")
 
 ;;;###autoload
 (geiser-implementation-extension 'chibi "sld")
