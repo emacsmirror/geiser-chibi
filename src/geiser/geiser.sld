@@ -7,7 +7,8 @@
           geiser:no-values
           geiser:symbol-location ; implement this interface in [[file://./geiser.scm#geiser:symbol-location]] in order to make proper cross-referencing working.
           geiser:module-location
-          geiser:newline)
+          geiser:newline
+          geiser:add-to-load-path)
   (import
     (scheme small)
     (chibi modules)

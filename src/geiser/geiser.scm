@@ -73,7 +73,7 @@
       (write ; to standard output (to comint)
        `((result ,(write-to-string result))
          (output . ,(get-output-string output))))))
-  (values))
+  #f)
 
 
 (define (geiser:module-completions prefix . rest)
@@ -294,3 +294,12 @@
             (module-name->file
              (module-name l-module))) 0 )
           (make-location '() '())))))
+
+(define (geiser:add-to-load-path directory . rest)
+  (guard (err
+          (else
+           (display "Error in add-to-load-path:\n")
+           (display err)
+           (newline)
+           (make-location '() '())))
+    (add-module-directory directory #f)))
