@@ -44,7 +44,7 @@
   :group 'geiser-chibi)
 
 (geiser-custom--defcustom geiser-chibi-extra-command-line-parameters
-    '("-R" "-m" "chibi ast")
+    nil
   "Additional parameters to supply to the Chibi binary."
   :type '(repeat string)
   :group 'geiser-chibi)
